@@ -1,10 +1,12 @@
+---
 layout: post
 title: "Delta Lake Atomicity"
-date: 2025-11-21 17:07:00 -0000
+date: 2025-11-21
 categories: Delta-Lake
+---
 
 
-My notes on Atomicity in Delta Lake - it's easier for me to compare it to traditional databases.
+I wanted to clarify to myself how we achieve Atomicity in Delta Lake and it's easier for me to compare it to traditional databases.
 
 Atomicity means that when we commit a transaction it's an all-or-nothing operation. Either the transaction succeeds or it fails, nothing in between. Consistency means that despite our transaction being atomic, if some database constraint (e.g., a foreign key) is violated, then the operation is rejected and rolled back in spite of the commits being atomic. This distinction is important and will become clear why later. Atomicity pertains to the mechanism, whereas consistency checks if the transactions make logical sense given the constraints of the data model.
 
