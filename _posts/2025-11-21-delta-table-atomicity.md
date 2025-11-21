@@ -57,7 +57,7 @@ In the Delta format, we have a compute engine (e.g., Spark, DuckDB, Trino). The 
 
 **Here's the key difference: There is no recovery... what?**
 
-The compute engine does not update pages in place, so there's no need to worry about unpredictable page flushing to disk. The Parquet files are rewritten to storage, and a JSON log entry is added describing the write operation (copy-on-write). The JSON log entry says:
+The compute engine does not update pages in place, so there's no need to worry about unpredictable page flushing to disk. The Parquet files are rewritten to storage (added not ovewriting the existing ones), and a JSON log entry is added describing the write operation (copy-on-write). The JSON log entry says:
 
 - `Remove: file_A.parquet` ← The one we modified
 - `Add: file_B.parquet` ← The new one with modified data
