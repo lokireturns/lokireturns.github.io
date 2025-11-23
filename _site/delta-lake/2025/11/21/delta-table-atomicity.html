@@ -80,7 +80,7 @@ If crash happens at step 4:
 → Page X changes restored
 </code></pre></div></div>
 
-<p>So how does the transaction log in the Delta format give us atomicity? After all, it’s not a WAL, is it?</p>
+<p>So how does the <a href="https://dennyglee.com/2023/08/31/what-is-the-delta-lake-transaction-log/">transaction log</a> in the Delta format give us atomicity? After all, it’s not a WAL, is it?</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Delta Lake Architecture]
 
@@ -95,7 +95,7 @@ Object Storage (S3/GCS/ADLS)
 
 <p><strong>Here’s the key difference: There is no recovery… what?</strong></p>
 
-<p>The compute engine does not update pages in place, so there’s no need to worry about unpredictable page flushing to disk. The Parquet files are rewritten to storage, and a JSON log entry is added describing the write operation (copy-on-write). The JSON log entry says:</p>
+<p>The compute engine does not update pages in place, so there’s no need to worry about unpredictable page flushing to disk. The Parquet files are rewritten to storage (added not ovewriting the existing ones), and a JSON log entry is added describing the write operation (copy-on-write). The JSON log entry says:</p>
 
 <ul>
   <li><code class="language-plaintext highlighter-rouge">Remove: file_A.parquet</code> ← The one we modified</li>
@@ -103,6 +103,8 @@ Object Storage (S3/GCS/ADLS)
 </ul>
 
 <p>Therefore, if there’s a crash (typically some network error), either the JSON entry exists or it doesn’t. Even if the new Parquet files exist, they are logically invisible (orphaned) to the compute engine. Thus, the sequence is opposite to traditional databases: we write the Parquet files first, and only then write our JSON log.</p>
+
+<p>When we write to a single file such storage systems the write is guaranteed to be atomic. This is crucial as we will see later when we discuss <a href="#">isolation</a> in delta lakes.</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Delta Lake Commit Sequence]
 

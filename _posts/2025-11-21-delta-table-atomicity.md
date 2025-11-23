@@ -41,7 +41,7 @@ If crash happens at step 4:
 → Page X changes restored
 ```
 
-So how does the transaction log in the Delta format give us atomicity? After all, it's not a WAL, is it?
+So how does the [transaction log](https://dennyglee.com/2023/08/31/what-is-the-delta-lake-transaction-log/) in the Delta format give us atomicity? After all, it's not a WAL, is it?
 
 ```
 [Delta Lake Architecture]
@@ -63,6 +63,8 @@ The compute engine does not update pages in place, so there's no need to worry a
 - `Add: file_B.parquet` ← The new one with modified data
 
 Therefore, if there's a crash (typically some network error), either the JSON entry exists or it doesn't. Even if the new Parquet files exist, they are logically invisible (orphaned) to the compute engine. Thus, the sequence is opposite to traditional databases: we write the Parquet files first, and only then write our JSON log.
+
+When we write to a single file such storage systems the write is guaranteed to be atomic. This is crucial as we will see later when we discuss [isolation](#) in delta lakes.
 
 ```
 [Delta Lake Commit Sequence]
